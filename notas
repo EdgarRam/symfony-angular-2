@@ -1,0 +1,4 @@
+php bin/console doctrine:mapping:import BackendBundle yml
+
+
+php bin/console doctrine:generate:entities BackendBundle
