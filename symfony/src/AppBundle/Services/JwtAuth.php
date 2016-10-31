@@ -6,14 +6,15 @@ use Firebase\JWT\JWT;
 class JwtAuth{
 
     public $manager;
-    private $key = "clave-secreta";
+    private $key;
 
     public function __construct( $manager ){
         $this->manager = $manager;
+        $this->key = "clave-secreta";
     }
 
     public function signup( $email, $password, $getHash = null ){
-
+        $key = $this->key;
         $user = $this->manager->getRepository( 'BackendBundle:User' )->findOneBy(
             array(
                 'email' => $email ,
@@ -55,9 +56,34 @@ class JwtAuth{
     }
 
     public function checkToken( $jwt, $getIdentity = false ){
+        $key = $this->key;
+        $auth = false;
+
+        try{
+            $decoded = JWT::decode( $jwt, $key, array('HS256') );
+        }
+        catch( \UnexpectedValueException $e){
+            $auth = false;
+        }
+        catch( \DomainException $e){
+            $auth = false;
+        }
+
+        if( isset( $decoded->sub ) ){
+            $auth = true;
+        }
+        else{
+            $auth= false;
+        }
+
+        if( $getIdentity ){
+            return $decoded;
+        }
+        return $auth;
 
     }
 
 }
 
- ?>
+
+?>

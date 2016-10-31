@@ -41,13 +41,14 @@ class DefaultController extends Controller
 
             $validate_email = $this->get("validator")->validate( $email, $emailContraint );
 
+            $pwd = hash('sha256', $password);
 
             if( count($validate_email) == 0 && $password != null ){
 
                 if( $getHash == null )
-                    $signup = $jwt_auth->signup( $email, $password );
+                    $signup = $jwt_auth->signup( $email, $pwd );
                 else{
-                    $signup = $jwt_auth->signup( $email, $password, true );
+                    $signup = $jwt_auth->signup( $email, $pwd, true );
                 }
                 return new JsonResponse($signup);
 
@@ -74,10 +75,18 @@ class DefaultController extends Controller
     public function pruebasAction(Request $request){
         $helpers = $this->get("app.helpers");
 
+
+
+        $hash = $request->get( "authorization", null);
+        $check = $helpers->authCheck( $hash );
+
+        var_dump( $check  );
+        /*
         $em = $this->getDoctrine()->getManager();
         $users = $em->getRepository('BackendBundle:User')->findAll();
-
-        return $helpers->json($users);
+        */
+        die();
+        // return $helpers->json($users);
     }
 
 
